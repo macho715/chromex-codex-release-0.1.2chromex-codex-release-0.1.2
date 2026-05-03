@@ -33,6 +33,171 @@ Chromex는 Chrome과 Codex를 로컬 네이티브 브리지로 연결하는 Chro
 
 릴리즈 ZIP 파일은 GitHub Release에 첨부되는 파일입니다. 저장소 파일 목록에 직접 커밋하지 않습니다. 직접 다운로드 링크가 열리지 않으면 [최신 릴리즈 페이지](https://github.com/GENEXIS-AI/chromex/releases/latest)의 **Assets**에서 `chromex-unpacked-extension.zip`을 다운로드하세요.
 
+## 자세한 설치 방법
+
+Chromex는 Chrome 확장 프로그램과 로컬 native host를 함께 사용합니다.
+일반 사용자는 릴리즈 ZIP으로 설치하는 방법을 권장합니다.
+소스 코드를 수정하거나 직접 빌드하려면 개발자 소스 설치를 사용합니다.
+
+### 설치 전 준비
+
+다음 항목을 먼저 준비합니다.
+
+- Google Chrome 또는 Chromium 기반 브라우저
+- 로컬에서 실행 가능한 Codex 환경
+- GitHub Release에서 받은 `chromex-unpacked-extension.zip` 또는 이 저장소 소스 코드
+- 개발자 설치를 할 경우 Node.js와 npm
+
+설치 중 Chrome의 **개발자 모드**를 켜야 합니다.
+이는 Chrome Web Store가 아닌 압축 해제 확장 프로그램을 직접 로드하기 위해 필요합니다.
+
+### 방법 A: 릴리즈 ZIP으로 설치
+
+이 방법은 코드를 빌드하지 않고 바로 설치할 때 사용합니다.
+
+1. [최신 GitHub Release](https://github.com/GENEXIS-AI/chromex/releases/latest)를 엽니다.
+2. **Assets**에서 `chromex-unpacked-extension.zip`을 다운로드합니다.
+3. ZIP 파일을 원하는 위치에 압축 해제합니다.
+4. 압축 해제 후 `chromex-extension` 폴더가 있는지 확인합니다.
+5. Chrome 주소창에 `chrome://extensions`를 입력합니다.
+6. 오른쪽 위 **개발자 모드**를 켭니다.
+7. **압축해제된 확장 프로그램을 로드합니다**를 누릅니다.
+8. 압축 해제한 `chromex-extension` 폴더를 선택합니다.
+9. Chrome 확장 프로그램 목록에 Chromex가 표시되는지 확인합니다.
+10. Chrome 툴바 또는 사이드 패널에서 Chromex를 열고 온보딩을 진행합니다.
+
+폴더 선택 시 ZIP 파일 자체를 선택하면 설치되지 않습니다.
+반드시 ZIP을 먼저 풀고, 그 안의 `chromex-extension` 폴더를 선택해야 합니다.
+
+### 방법 B: 소스 코드에서 직접 설치
+
+이 방법은 저장소를 직접 빌드해서 설치할 때 사용합니다.
+
+```bash
+git clone https://github.com/GENEXIS-AI/chromex.git
+cd chromex
+npm install
+npm run build
+node scripts/install-native-host.mjs
+```
+
+빌드가 끝나면 Chrome에서 다음 폴더를 확장 프로그램으로 로드합니다.
+
+```text
+packages/extension/dist
+```
+
+Chrome에서 진행할 단계는 다음과 같습니다.
+
+1. Chrome 주소창에 `chrome://extensions`를 입력합니다.
+2. **개발자 모드**를 켭니다.
+3. **압축해제된 확장 프로그램을 로드합니다**를 누릅니다.
+4. 저장소 안의 `packages/extension/dist` 폴더를 선택합니다.
+5. Chromex 카드가 표시되면 **새로고침** 버튼을 한 번 누릅니다.
+6. Chromex 사이드 패널을 열고 연결 상태를 확인합니다.
+
+### Windows PowerShell 설치 예시
+
+Windows에서 이 저장소를 이미 다운로드했다면 다음 순서로 실행할 수 있습니다.
+
+```powershell
+Set-Location "C:\Users\jichu\Downloads\chromex-codex-release-0.1.2"
+npm install
+npm run build
+node scripts/install-native-host.mjs
+```
+
+그다음 Chrome에서 다음 폴더를 로드합니다.
+
+```text
+C:\Users\jichu\Downloads\chromex-codex-release-0.1.2\packages\extension\dist
+```
+
+### 설치 확인
+
+설치 후 다음 항목을 확인합니다.
+
+1. `chrome://extensions`에 Chromex 카드가 보입니다.
+2. Chromex 카드에 오류가 표시되지 않습니다.
+3. Chromex 사이드 패널이 열립니다.
+4. 온보딩 또는 시스템 상태 화면에서 native bridge 연결 상태를 확인할 수 있습니다.
+5. 현재 페이지 요약 같은 간단한 요청이 동작합니다.
+
+개발자 설치에서는 로컬 검증 명령도 실행할 수 있습니다.
+
+```bash
+npm run typecheck
+npm run test
+npm run build
+npm run release:audit
+```
+
+브라우저 로드까지 확인하려면 smoke test를 실행합니다.
+
+```bash
+npm run smoke
+```
+
+브라우저 런타임이 없다는 오류가 나오면 먼저 다음 명령을 실행합니다.
+
+```bash
+npm run smoke:install-browser
+```
+
+### 업데이트 방법
+
+릴리즈 ZIP 설치를 업데이트할 때는 다음 순서로 진행합니다.
+
+1. 최신 `chromex-unpacked-extension.zip`을 다시 다운로드합니다.
+2. 기존 압축 해제 폴더와 다른 위치에 새 ZIP을 풉니다.
+3. `chrome://extensions`에서 기존 Chromex 카드를 제거하거나 새 폴더로 다시 로드합니다.
+4. Chromex 카드를 새로고침합니다.
+5. 사이드 패널을 열어 연결 상태를 확인합니다.
+
+소스 설치를 업데이트할 때는 다음 순서로 진행합니다.
+
+```bash
+git pull
+npm install
+npm run build
+node scripts/install-native-host.mjs
+```
+
+그다음 `chrome://extensions`에서 Chromex 카드를 새로고침합니다.
+
+### 재설치 방법
+
+확장 프로그램이 오래된 UI를 계속 보여주거나 native host 연결이 실패하면 재설치합니다.
+
+1. `chrome://extensions`를 엽니다.
+2. 기존 Chromex 카드를 제거합니다.
+3. `npm run build`를 다시 실행합니다.
+4. `node scripts/install-native-host.mjs`를 다시 실행합니다.
+5. `packages/extension/dist` 또는 `chromex-extension` 폴더를 다시 로드합니다.
+6. Chrome을 재시작한 뒤 Chromex를 다시 엽니다.
+
+### 삭제 방법
+
+Chrome 확장 프로그램만 삭제하려면 `chrome://extensions`에서 Chromex 카드를 제거합니다.
+
+개발자 설치에서 native host 등록까지 정리하려면 운영체제별 Chrome native messaging host 등록 위치를 확인해야 합니다.
+이 저장소에서는 설치 스크립트가 native host 등록을 수행하므로, 삭제 전에 등록 파일 경로를 먼저 확인하는 방식이 안전합니다.
+
+```bash
+node scripts/install-native-host.mjs
+```
+
+위 명령으로 현재 등록 흐름과 경로를 확인한 뒤, 더 이상 사용하지 않는 등록 파일만 삭제하세요.
+
+### 설치 문제 해결
+
+- **Chrome에서 폴더를 로드할 수 없음**: ZIP 파일을 직접 선택했는지 확인하세요. 압축을 푼 폴더를 선택해야 합니다.
+- **Chromex 카드에 오류가 표시됨**: `npm run build`를 다시 실행한 뒤 Chrome 확장 프로그램 카드를 새로고침하세요.
+- **Native host 연결 실패**: `node scripts/install-native-host.mjs`를 다시 실행하고 Chrome을 재시작하세요.
+- **사이드 패널이 열리지 않음**: Chrome 툴바에서 Chromex 아이콘을 고정한 뒤 다시 열어 보세요.
+- **페이지 내용을 읽지 못함**: 대상 사이트 권한을 승인했는지 확인하고, 해당 탭에서 Chromex를 다시 여세요.
+- **테스트에서 브라우저가 없다고 나옴**: `npm run smoke:install-browser`를 실행한 뒤 `npm run smoke`를 다시 실행하세요.
+
 개발자 소스 설치:
 
 ```bash
